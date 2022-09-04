@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Hummingbird vesion="13">
+    <jsinit>
+    </jsinit>
+    
+    <jscode loadfromfile="">   
+        <script>
+            function init() {
+                console.log("hello world")
+            }
+        </script>
+    </jscode>
+
+    <jsparams>
+    </jsparams>
+</Hummingbird>
