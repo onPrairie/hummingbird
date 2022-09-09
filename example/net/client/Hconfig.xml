@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Hummingbird vesion="13">
+    <jsinit>
+        <tcp connect="localhost:60000"/>
+        <udp connect="localhost:60000"/>
+    </jsinit>
+    
+    <jscode loadfromfile="">   
+        <script>
+          	function init() {
+              udp.write("hello world")
+              console.log(udp.read())
+              //传统调用  
+              // tcp.write("hello world")
+              // console.log(tcp.read())
+              //链式调用:udp与tcp皆可使用
+              var data =  tcp.write("hello world").read()
+              console.log(data)     
+            }
+        </script>
+    </jscode>
+
+    <jsparams>
+    </jsparams>
+</Hummingbird>

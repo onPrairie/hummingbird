@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Hummingbird vesion="13">
+    <jsinit>
+        <http bindaddress="localhost:8080"/>
+        <tcp bindaddress="localhost:60000"/>
+        <udp bindaddress="localhost:60000"/>
+    </jsinit>
+    
+    <jscode loadfromfile="">   
+        <script>
+          	 function init() {
+            }
+            function httprecv(req,res){
+                console.log(JSON.stringify(req));
+                res.write(req.Path)
+            }
+            function tcprecv(req,res){
+                console.log(JSON.stringify(req));
+                res.write("hello world")
+            }
+            function udprecv(req,res){
+                console.log(JSON.stringify(req))
+                res.write("hello world")
+            }
+        </script>
+    </jscode>
+
+    <jsparams>
+    </jsparams>
+</Hummingbird>

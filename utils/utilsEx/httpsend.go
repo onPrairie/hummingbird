@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-//http://192.168.1.170:8080/postdir.aspx
-
 //var urls string
 
 //method ： GET,POST,PUT,DELETE
@@ -26,6 +24,25 @@ func HttpSend(method string, url string, msg []byte, headers map[string]string) 
 		req.Header.Set(key, header)
 	}
 	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	// defer func() {
+	// 	if resp != nil {
+	// 		resp.Body.Close()
+	// 	}
+	// }()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
+}
+
+//设置为simple请求
+func HttpSendfortext(method string, url string, msg []byte, headers map[string]string) (string, error) {
+	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
 	}

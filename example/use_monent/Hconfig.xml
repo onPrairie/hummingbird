@@ -4,10 +4,11 @@
     </jsinit>
     
     <jscode loadfromfile="">   
+        <script src="http://cdn.staticfile.org/moment.js/2.24.0/moment.js"/>
         <script>
-        function init(){
-            console.log("hello world")
-        }
+          	function init() {
+                console.log(moment().format('YYYY-MM-DD HH:mm:ss'))
+            }
         </script>
     </jscode>
 

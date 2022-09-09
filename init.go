@@ -39,11 +39,11 @@ func initparm() {
 		}
 		Maxage = agei
 	} else {
-		Maxage = 24 * 30
+		Maxage = -1
 	}
 	var rottime int
 	if con.Jsinit.Log.RotationTime != "" {
-		rottimes, err := strconv.Atoi(con.Jsinit.Log.Maxage)
+		rottimes, err := strconv.Atoi(con.Jsinit.Log.RotationTime)
 		if err != nil {
 			ulog.Warnln(err)
 			return
@@ -293,11 +293,22 @@ func getbigcontext() string {
 	if con.Jscode.Loadfromfile == "" {
 		for i := 0; i < len(con.Jscode.Script); i++ {
 			if con.Jscode.Script[i].Src != "" {
-				file, err := ioutil.ReadFile(con.Jscode.Script[i].Src)
-				if err != nil {
-					ulog.Panicln(err)
+				index := strings.Index(con.Jscode.Script[i].Src, "http")
+				if index == 0 {
+					s, err := utilsEx.HttpSendfortext("get", con.Jscode.Script[i].Src, nil, nil)
+					if err != nil {
+						ulog.Warnln(err)
+						return ""
+					}
+					filecontext += string(s)
+				} else {
+					file, err := ioutil.ReadFile(con.Jscode.Script[i].Src)
+					if err != nil {
+						ulog.Panicln(err)
+					}
+					filecontext += string(file)
 				}
-				filecontext += string(file)
+
 				con.Jscode.Script[i].Src = ""
 			} else if strings.TrimSpace(con.Jscode.Script[i].Value) != "" {
 				filecontext += con.Jscode.Script[i].Value
@@ -308,14 +319,23 @@ func getbigcontext() string {
 	} else {
 		//外部加载
 		for i := 0; i < len(con.Jscode.Script); i++ {
-			if con.Jscode.Script[i].Src != "" {
+			index := strings.Index(con.Jscode.Script[i].Src, "http")
+			if index == 0 {
+				s, err := utilsEx.HttpSendfortext("get", con.Jscode.Script[i].Src, nil, nil)
+				if err != nil {
+					ulog.Warnln(err)
+					return ""
+				}
+				filecontext += string(s)
+			} else {
 				file, err := ioutil.ReadFile(con.Jscode.Script[i].Src)
 				if err != nil {
 					ulog.Panicln(err)
 				}
 				filecontext += string(file)
-				con.Jscode.Script[i].Src = ""
 			}
+
+			con.Jscode.Script[i].Src = ""
 		}
 		file, err := ioutil.ReadFile(con.Jscode.Loadfromfile)
 		if err != nil {

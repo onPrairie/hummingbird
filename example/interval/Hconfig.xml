@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Hummingbird vesion="13">
     <jsinit>
+      <Interval>
+        4s
+      </Interval>
     </jsinit>
     
     <jscode loadfromfile="">   
         <script>
-        function init(){
-            console.log("hello world")
-        }
+            function init() {
+            }
+            function Interval(){
+                console.log("time:",new Date())
+            }
         </script>
     </jscode>
 
