@@ -4,10 +4,10 @@
     </jsinit>
     
     <jscode loadfromfile="">   
-        <script>
-        function init(){
+        <script>    
+		function init(){
             console.log("hello world")
-        }
+        } 
         </script>
     </jscode>
 

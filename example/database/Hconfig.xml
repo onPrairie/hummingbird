@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Hummingbird vesion="13">
+    <jsinit>
+    <Database>
+        <conname>root:@(127.0.0.1:3306)/test</conname>
+    </Database>
+    </jsinit>
+    
+    <jscode loadfromfile="">   
+        <script>    
+		function init(){
+           create()
+           insert()
+           select()
+        } 
+        </script>
+         <script>
+        function create(){
+           var sql =  "CREATE TABLE `student`  ( " +
+           " `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,"+
+           " `age` int(11) NULL DEFAULT NULL" +
+           ") ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;"
+           Mysql.exec(sql)
+        }
+        </script>
+        <script>
+        function insert(){
+           var sql ="INSERT INTO student VALUES('张三', 18)"
+           Mysql.exec(sql)
+        }
+        </script>
+        <script>
+        <![CDATA[ 
+        function select(){
+           var sql ="SELECT * FROM student"
+           var stus =  Mysql.select(sql)
+           	for (var i = 0; i < stus.length; i++) {
+                console.log(JSON.stringify(stus[i]));
+            } 
+        }
+        ]]>
+        </script>
+    </jscode>
+
+    <jsparams>
+        <params id="student">
+            <arg>lixiang</arg>
+            <arg>20</arg>
+        </params>
+    </jsparams>
+</Hummingbird>

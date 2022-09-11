@@ -243,6 +243,25 @@ func RegisterJsParser(funcname string) {
 			RemoveBefore(paths, difftime)
 			return otto.Value{}
 		})
+	case "filerename":
+		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
+			odlpath := call.Argument(0).String()
+			newpath := call.Argument(1).String()
+			err := os.Rename(odlpath, newpath)
+			if err != nil {
+				ulog.Warnln(err)
+			}
+			return otto.Value{}
+		})
+	case "fileremove":
+		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
+			path := call.Argument(0).String()
+			err := os.RemoveAll(path)
+			if err != nil {
+				ulog.Warnln(err)
+			}
+			return otto.Value{}
+		})
 	//****************************日志相关****************************
 	//***************************************************************
 	case "log":

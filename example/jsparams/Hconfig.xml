@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Hummingbird vesion="13">
+    <jsinit>
+    </jsinit>
+    
+    <jscode loadfromfile="">   
+        <script>
+		<![CDATA[    
+		function init(){
+           var student =  Getjsparamsbyid("student")
+           console.log("name:",student[0],"age:",student[1])
+        } 
+		]]>
+        </script>
+    </jscode>
+
+    <jsparams>
+        <params id="student">
+            <arg>lixiang</arg>
+            <arg>20</arg>
+        </params>
+    </jsparams>
+</Hummingbird>

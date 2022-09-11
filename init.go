@@ -176,6 +176,8 @@ func initjsenv() {
 	utilsEx.RegisterJsParser("filestate")
 	utilsEx.RegisterJsParser("dirstate")
 	utilsEx.RegisterJsParser("mkdir")
+	utilsEx.RegisterJsParser("filerename")
+	utilsEx.RegisterJsParser("fileremove")
 
 	utilsEx.RegisterJsParser("log")
 	utilsEx.RegisterJsParser("Getjsparamsbyid")
