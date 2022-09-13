@@ -26,7 +26,7 @@ Hummingbird只遵循一种原则：**简单易用**。
 **目标：** 向控制台输出hello world
 1. 下载红色边框内的执行程序：
 [https://gitee.com/QdbcShen/hummingbird/releases/](https://gitee.com/QdbcShen/hummingbird/releases/)
-![下载](https://img-blog.csdnimg.cn/69d76fa435954789adb691fc44abf0b4.png)
+![download](ReadMe/download.png)
 
 2. 在Hummingbird程序路径下创建Hconfig.xml,内容如下：
 ```xml
@@ -48,7 +48,7 @@ Hummingbird只遵循一种原则：**简单易用**。
 </Hummingbird>
 ```
 3. 启动Hummingbird，在控制台你会看到打印字符串
-![图1](https://img-blog.csdnimg.cn/91b6fcd828664415a4d45d02f6aa2d56.png)
+![hello](ReadMe/hello.png)
 	
 ## Hconfig.xml说明
 ###  Hconfig.xml的基础框架
