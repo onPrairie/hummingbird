@@ -3,7 +3,7 @@
 
  - 介绍：
 
-Hummingbird 是一套遵循 MIT协议的开源 JavaScript 运行引擎。设计的初衷是为了敏捷开发，尽量做到省时省力。
+Hummingbird 是一套遵循 Apache协议的开源 JavaScript 运行引擎。设计的初衷是为了敏捷开发，尽量做到省时省力。
 
  - Hummingbird 可以做什么？
 
