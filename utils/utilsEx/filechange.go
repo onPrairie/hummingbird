@@ -107,7 +107,7 @@ func Copy(oldpath, newpath string) error {
 
 //paths 目录，此目录下文件全部清空
 //diff_time 秒
-func RemoveBefore(paths string, diff_time int64) {
+func RemoveBefore(paths string, diff_time int64) error {
 	now_time := time.Now().Unix() //当前时间，main使用Unix时间戳
 	err := filepath.Walk(paths, func(paths string, f os.FileInfo, err error) error {
 		if f == nil {
@@ -119,17 +119,15 @@ func RemoveBefore(paths string, diff_time int64) {
 			dirs := isFile(paths)
 			if dirs == true {
 				os.RemoveAll(paths)
-			} else {
-				ulog.Logs.Warnln("目录为空，默认不删除")
 			}
 
-		} //else {
-		//println(paths)
-		//}
+		}
 		return nil
 	})
 	if err != nil {
-		ulog.Logs.Warnf("filepath.Walk() returned %+v\r\n", err)
+		return err
+	} else {
+		return nil
 	}
 }
 func isFile(f string) bool {

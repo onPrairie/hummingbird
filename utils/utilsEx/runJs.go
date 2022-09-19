@@ -7,9 +7,11 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"strconv"
 	"time"
 	"utils/ulog"
 
+	"github.com/gookit/color"
 	"github.com/robertkrimen/otto"
 )
 
@@ -29,6 +31,10 @@ type Cfileinfo struct {
 	IsDir   bool
 	ModTime time.Time
 	Size    int64
+}
+type JsErr struct {
+	Err      string
+	Funcname string
 }
 
 //网络连接
@@ -111,36 +117,48 @@ func RegisterJsParser(funcname string) {
 
 	//****************************文件操作****************************
 	//***************************************************************
-	case "filemove":
+	case "__filemove":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			oldpath := call.Argument(0).String()
 			newpath := call.Argument(1).String()
 			ulog.Debugln("filemove:", call.Argument(0).String(), call.Argument(1).String())
 			err := Move(oldpath, newpath)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "filemove"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			return otto.Value{}
 		})
-	case "copyfile":
+	case "__copyfile":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			oldpath := call.Argument(0).String()
 			newpath := call.Argument(1).String()
 			ulog.Debugln("copyfile:", call.Argument(0).String(), call.Argument(1).String())
 			err := Copy(oldpath, newpath)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "copyfile"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			return otto.Value{}
 		})
-	case "writefile":
+	case "__writefile":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			filename := call.Argument(0).String()
 			data := call.Argument(1).String()
 			ulog.Debugln("copyfile:", call.Argument(0).String(), call.Argument(1).String())
 			err := ioutil.WriteFile(filename, []byte(data), 0777)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "writefile"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			return otto.Value{}
 		})
@@ -151,22 +169,30 @@ func RegisterJsParser(funcname string) {
 			result, _ := vm.ToValue(t)
 			return result
 		})
-	case "readfile":
+	case "__readfile":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			absolute_path := call.Argument(0).String()
 			data, err := ioutil.ReadFile(absolute_path)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "readfile"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			result, _ := vm.ToValue(string(data))
 			return result
 		})
-	case "filestate":
+	case "__filestate":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			path := call.Argument(0).String()
 			fileinfo, err := os.Stat(path)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "filestate"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			var info Cfileinfo
 			info.Name = fileinfo.Name()
@@ -184,12 +210,16 @@ func RegisterJsParser(funcname string) {
 			result, _ := vm.ToValue(info)
 			return result
 		})
-	case "dirstate":
+	case "__dirstate":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			path := call.Argument(0).String()
 			dirs, err := ioutil.ReadDir(path)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "filestate"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			var info []Cfileinfo
 			info = make([]Cfileinfo, len(dirs))
@@ -205,60 +235,91 @@ func RegisterJsParser(funcname string) {
 					info[i].Size = dirs[i].Size()
 				}
 				if err != nil {
-					ulog.Warnln(err)
+					var Serr JsErr
+					Serr.Funcname = "filestate"
+					Serr.Err = err.Error()
+					result, _ := vm.ToValue(Serr)
+					return result
 				}
 			}
 			result, _ := vm.ToValue(info)
 			return result
 		})
-	case "mkdir":
+	case "__mkdir":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			paths := call.Argument(0).String()
 			err := os.MkdirAll(paths, 0777)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "mkdir"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			return otto.Value{}
 		})
-	case "Getjsparamsbyid":
+	case "__Getjsparamsbyid":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			key := call.Argument(0).String()
 			ulog.Debugln("Getjsparamsbyid:", key)
 			v, ok := Paramsmp[key]
 			if ok == false {
-				panic("mp is not exit")
+				var Serr JsErr
+				Serr.Funcname = "Getjsparamsbyid"
+				Serr.Err = "mp is not exit"
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			result, _ := vm.ToValue(v)
 			return result
 		})
-	case "RemoveBeforeHour":
+	case "__RemoveBeforeHour":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			paths := call.Argument(0).String()
-			hour, err := call.Argument(1).ToInteger()
+			hours := call.Argument(1).String()
+			hour, err := strconv.Atoi(hours)
 			if err != nil {
-				ulog.Warnln(err)
-				return otto.Value{}
+				var Serr JsErr
+				Serr.Funcname = "Getjsparamsbyid"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			difftime := int64(hour) * 3600
-			RemoveBefore(paths, difftime)
+			err = RemoveBefore(paths, difftime)
+			if err != nil {
+				var Serr JsErr
+				Serr.Funcname = "Getjsparamsbyid"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
+			}
 			return otto.Value{}
 		})
-	case "filerename":
+	case "__filerename":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			odlpath := call.Argument(0).String()
 			newpath := call.Argument(1).String()
 			err := os.Rename(odlpath, newpath)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "filerename"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			return otto.Value{}
 		})
-	case "fileremove":
+	case "__fileremove":
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			path := call.Argument(0).String()
 			err := os.RemoveAll(path)
 			if err != nil {
-				ulog.Warnln(err)
+				var Serr JsErr
+				Serr.Funcname = "fileremove"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
 			}
 			return otto.Value{}
 		})
@@ -272,7 +333,7 @@ func RegisterJsParser(funcname string) {
 		})
 	//****************************网络相关****************************
 	//***************************************************************
-	case "HttpSend":
+	case "__HttpSend":
 		//***  暂不支持header
 		vm.Set(funcname, func(call otto.FunctionCall) otto.Value {
 			types := call.Argument(0).String()
@@ -282,7 +343,13 @@ func RegisterJsParser(funcname string) {
 				msg = ""
 			}
 			s, err := HttpSend(types, Ledadddress, []byte(msg), nil)
-			ulog.Debugln("HttpSend:", s, err)
+			if err != nil {
+				var Serr JsErr
+				Serr.Funcname = "fileremove"
+				Serr.Err = err.Error()
+				result, _ := vm.ToValue(Serr)
+				return result
+			}
 			result, _ := vm.ToValue(s)
 			return result
 		})
@@ -401,6 +468,7 @@ func JsGet(key string) otto.Value {
 func JsParserbuffer(functionName string, args ...interface{}) (result string) {
 	value, err := vm.Call(functionName, nil, args...)
 	if err != nil {
+		color.Red.Println("WARN:", err)
 		ulog.Warnln(err)
 		return ""
 	}

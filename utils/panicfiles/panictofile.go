@@ -170,7 +170,7 @@ func init0() {
 		return
 	}
 	if summd5 == con.Program {
-		log.Println("Because it is the same executable, only the necessary files are cleaned up")
+		// log.Println("Because it is the same executable, only the necessary files are cleaned up")
 		for _, info := range dir {
 			// if info.IsDir() {
 			// 	log.Println("Ignore folder")

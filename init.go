@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	_ "embed"
 	"encoding/xml"
 	"fmt"
@@ -13,6 +14,8 @@ import (
 	"time"
 	ulog "utils/ulog"
 	utilsEx "utils/utilsEx"
+
+	"github.com/vua/vfmt"
 )
 
 //go:embed title
@@ -27,6 +30,7 @@ func initparm() {
 	}
 	context := os.Expand(title, func(k string) string { return dev[k] })
 	fmt.Println(context)
+	// vfmt.Println("[更多请访问] @[https://onprairie.github.io::blue|underline]")
 	title = ""
 	data1 := readfile("Hconfig.xml")
 	config_path(data1)
@@ -34,7 +38,7 @@ func initparm() {
 	if con.Jsinit.Log.Maxage != "" {
 		agei, err := strconv.Atoi(con.Jsinit.Log.Maxage)
 		if err != nil {
-			ulog.Warnln(err)
+			out_warn(1, err)
 			return
 		}
 		Maxage = agei
@@ -45,7 +49,7 @@ func initparm() {
 	if con.Jsinit.Log.RotationTime != "" {
 		rottimes, err := strconv.Atoi(con.Jsinit.Log.RotationTime)
 		if err != nil {
-			ulog.Warnln(err)
+			out_warn(1, err)
 			return
 		}
 		rottime = rottimes
@@ -111,7 +115,7 @@ func initparm() {
 func config_path(data1 string) {
 	err := xml.Unmarshal([]byte(data1), &con)
 	if err != nil {
-		ulog.Logs.Panic(err)
+		out_warn(1, err)
 		return
 	}
 }
@@ -126,7 +130,7 @@ func connect_network() {
 	if con.Jsinit.Tcp.Connect != "" {
 		conn, err := net.Dial("tcp", con.Jsinit.Tcp.Connect)
 		if err != nil {
-			ulog.Warnln(err)
+			out_warn(1, err)
 			return
 		}
 		utilsEx.TcpConn = conn
@@ -135,12 +139,12 @@ func connect_network() {
 	if con.Jsinit.Udp.Connect != "" {
 		addr, err := net.ResolveUDPAddr("udp", con.Jsinit.Udp.Connect)
 		if err != nil {
-			ulog.Warnln(err)
+			out_warn(1, err)
 			return
 		}
 		conn, err := net.DialUDP("udp", nil, addr)
 		if err != nil {
-			ulog.Warnln(err)
+			out_warn(1, err)
 			return
 		}
 		utilsEx.UdpConn = conn
@@ -153,7 +157,7 @@ func initjsenv() {
 	for i := 0; i < len; i++ {
 		_, ok := utilsEx.Paramsmp[con.Jsparams.Params[i].Id]
 		if ok == true {
-			panic("mp is exit")
+			out_warn(1, "the Param key is exit")
 		}
 		utilsEx.Paramsmp[con.Jsparams.Params[i].Id] = con.Jsparams.Params[i].Arg
 		// con.Jsparams.Params[i].Id = ""
@@ -168,27 +172,27 @@ func initjsenv() {
 		utilsEx.RegisterJsParser("domysqlselect")
 	}
 	//文件及目录操作
-	utilsEx.RegisterJsParser("filemove")
+	utilsEx.RegisterJsParser("__filemove")
 	utilsEx.RegisterJsParser("findfiles")
-	utilsEx.RegisterJsParser("copyfile")
-	utilsEx.RegisterJsParser("writefile")
-	utilsEx.RegisterJsParser("readfile")
-	utilsEx.RegisterJsParser("filestate")
-	utilsEx.RegisterJsParser("dirstate")
-	utilsEx.RegisterJsParser("mkdir")
-	utilsEx.RegisterJsParser("filerename")
-	utilsEx.RegisterJsParser("fileremove")
+	utilsEx.RegisterJsParser("__copyfile")
+	utilsEx.RegisterJsParser("__writefile")
+	utilsEx.RegisterJsParser("__readfile")
+	utilsEx.RegisterJsParser("__filestate")
+	utilsEx.RegisterJsParser("__dirstate")
+	utilsEx.RegisterJsParser("__mkdir")
+	utilsEx.RegisterJsParser("__filerename")
+	utilsEx.RegisterJsParser("__fileremove")
 
 	utilsEx.RegisterJsParser("log")
-	utilsEx.RegisterJsParser("Getjsparamsbyid")
-	utilsEx.RegisterJsParser("RemoveBeforeHour")
-	//网络相关
-	utilsEx.RegisterJsParser("HttpSend")
+	utilsEx.RegisterJsParser("__Getjsparamsbyid")
+	utilsEx.RegisterJsParser("__RemoveBeforeHour")
+	//网络相关 客户端
+	utilsEx.RegisterJsParser("__HttpSend")
 	utilsEx.RegisterJsParser("__tcpsend")
 	utilsEx.RegisterJsParser("__tcpread")
 	utilsEx.RegisterJsParser("__udpsend")
 	utilsEx.RegisterJsParser("__udpread")
-	//服务端
+	//网络相关 服务端
 	inbuilt_func()
 
 	//程序资源监控
@@ -288,6 +292,59 @@ func chainConversion() string {
 	return filecontext
 }
 
+//js函数包装
+// argnum不仅表示参数个数
+func packkagefunction(funcname string, argnum int) string {
+	var filecontext string
+	if argnum == 1 {
+		filecontext = `
+		function ${0}(a){
+			var t =  __${0}(a)
+			if(t == undefined){
+				return t
+			}
+			if(t.hasOwnProperty("Err") == true){
+				throw JSON.stringify(t)
+			}
+			return t		
+		}
+		`
+	} else if argnum == 2 {
+		filecontext = `
+		function ${0}(a,b){
+			var t =  __${0}(a,b)
+			if(t == undefined){
+				return t
+			}
+			if(t.hasOwnProperty("Err") == true){
+				throw JSON.stringify(t)
+			}
+			return t		
+		}
+		`
+	} else if argnum == 3 {
+		filecontext = `
+		function ${0}(a,b,c){
+			var t =  __${0}(a,b,c)
+			if(t == undefined){
+				return t
+			}
+			if(t.hasOwnProperty("Err") == true){
+				throw JSON.stringify(t)
+			}
+			return t		
+		}
+		`
+	} else {
+		panic("err argnum")
+	}
+	var dev = map[string]string{
+		"0": funcname,
+	}
+	context := os.Expand(filecontext, func(k string) string { return dev[k] })
+	return context
+}
+
 //内部加载优先制，如果同时设置外部与内部，则采用内部加载，外部将无效
 func getbigcontext() string {
 	var filecontext string
@@ -346,7 +403,18 @@ func getbigcontext() string {
 		filecontext += string(file)
 		watcherFile = con.Jscode.Loadfromfile
 	}
-
+	filecontext += packkagefunction("readfile", 1)
+	filecontext += packkagefunction("filestate", 1)
+	filecontext += packkagefunction("copyfile", 1)
+	filecontext += packkagefunction("dirstate", 1)
+	filecontext += packkagefunction("writefile", 2)
+	filecontext += packkagefunction("filemove", 2)
+	filecontext += packkagefunction("filerename", 2)
+	filecontext += packkagefunction("fileremove", 1)
+	filecontext += packkagefunction("mkdir", 1)
+	filecontext += packkagefunction("Getjsparamsbyid", 1)
+	filecontext += packkagefunction("RemoveBeforeHour", 2)
+	filecontext += packkagefunction("HttpSend", 3)
 	filecontext += objConversion()
 	filecontext += RegisterObjet()
 	filecontext += chainConversion()
@@ -356,4 +424,25 @@ func getbigcontext() string {
 func runticker() {
 	ulog.Logs.Debugln("the ticker ------------>", time.Now())
 	utilsEx.JsParserbuffer("Interval")
+}
+
+//参数一: 如果为1则忽略日志输出
+//参数二: 报错信息
+// 以后的参数：必为错误信息，信息信息往日志里记
+func out_warn(args ...interface{}) {
+	output := args[1]
+	style := "#00ff00|bg#ff0000|bold"
+	if args[0] == 1 {
+		vfmt.Printf("@[WARN: %s::%s]\n", output, style)
+	} else {
+		ulog.Warnln(args...)
+		vfmt.Printf("@[WARN: %s::%s]\n", output, style)
+	}
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("按回车结束")
+	_, err := reader.ReadString('\n')
+	if err != nil {
+		panic(err)
+	}
+
 }

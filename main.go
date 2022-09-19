@@ -9,11 +9,8 @@ import (
 	utilsEx "utils/utilsEx"
 )
 
-const version = "202206.2884"
-
 func main() {
 	initparm()
-
 	if ticker != nil {
 		for {
 			select {

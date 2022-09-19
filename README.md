@@ -3,7 +3,7 @@
 
  - 介绍：
 
-Hummingbird 是一套遵循 Apache协议的开源 JavaScript 运行引擎。设计的初衷是为了敏捷开发，尽量做到省时省力。
+Hummingbird 是一套开源 的JavaScript 运行引擎。设计的初衷是为了敏捷开发，尽量做到省时省力。
 
  - Hummingbird 可以做什么？
 
@@ -477,15 +477,13 @@ filemove(src,dst)
 返回值：无
 
 ---
-
----
 示例：将Hummingbird图片从D盘1目录移动到2目录
 ```javascript
 function init() {
 	filemove("D:/1/Hummingbird.jpg","D:/2/NewHummingbird.jpg")
 }
 ```
-#### findfiles 获取文件名
+#### findfiles 查找文件名
 ```javascript
 findfiles(filename)
 ```
@@ -568,7 +566,7 @@ function init() {
 #### readfile  读取文件
 
 ```javascript
-writefile(filename)
+readfile(filename)
 ```
 
 参数filename：文件的完整路径名，路径斜杠使用正斜杠
@@ -696,7 +694,7 @@ filerename (src,dst)
 
 ---
 
-示例：遍历输出D盘下创建目录1及子级目录2
+示例：将D盘下创建目录1改为目录2
 ```javascript
 function init(){
 	filerename("D:/1","D:/22")
@@ -722,7 +720,7 @@ function init(){
 	fileremove("D:/1")
 } 
 ```
-#### RemoveBeforeHour 删除几小时之前的文件或者目录
+#### RemoveBeforeHour 删除几小时之前的文件
 ```javascript
 RemoveBeforeHour(filename,hour)
 ```
@@ -870,10 +868,22 @@ for (var i = 0; i < stus.length; i++) {
 ## 补充
 
  - js只兼容到es5，暂不支持es6。
- - 写js程序时建议加上<![CDATA[ ]]>标签，以防止与xml标签冲突
+ - 写js程序时建议加上\<![CDATA[ ]]>标签，以防止与xml标签冲突。
 - 更多是示例转至源码中example中阅览，地址[https://gitee.com/QdbcShen/hummingbird/tree/master/example](https://gitee.com/QdbcShen/hummingbird/tree/master/example)
 - console.log并不能铺开对象属性，需要手动将其转成json字符串。
-- 所有的错误信息在log下的warn日志中，js调用的api函数的调试信息在log下的debug中。
+- js调用的api函数的调试信息在log下的debug中。
+- 所有的异常均在控制台界面以红色字体显示，并捕捉到在log下的warn日志中。
+
+---
+示例：手动抛出一段测试异常，在控制台中看到红色警告提示。
+```xml
+<script>  
+function init() {
+	throw "Error test information"
+}
+</script>
+```
+![download](ReadMe/warn.png)
 
 
 ## 开源许可
